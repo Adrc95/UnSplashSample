@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">UnSplashSample</string>
+    <string name="action_settings">Opciones</string>
+    <string name="loading_photos_error">Algo salió mal al cargar las imagenes.</string>
+    <string name="loading_photo_error">Algo salió mal al cargar la imagen.</string>
+    <string name="author">Creador por:</string>
+    <string name="date_publication">Publicada el %1$s</string>
+    <string name="camera">Cámara</string>
+    <string name="lens">Lente</string>
+    <string name="on">en</string>
+    <string name="unsplash"><u>Unsplash</u></string>
+    <string name="camera_info_dialog">CAMERA_DIALOG</string>
+    <string name="no_description">El autor no ha proporcionado ninguna descripción para esta foto..</string>
+</resources>
