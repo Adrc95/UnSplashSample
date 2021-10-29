@@ -8,13 +8,13 @@ import com.adrc95.usecase.Invoker
 import com.adrc95.usecase.UseCaseInvoker
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import dagger.Binds
-
-
 
 
 @Module
+@InstallIn(SingletonComponent::class)
 class AppModule {
 
     @Provides

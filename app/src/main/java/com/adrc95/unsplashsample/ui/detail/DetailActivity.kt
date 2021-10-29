@@ -3,6 +3,7 @@ package com.adrc95.unsplashsample.ui.detail
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.adrc95.domain.model.Camera
 import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
@@ -10,10 +11,11 @@ import com.adrc95.unsplashsample.databinding.ActivityDetailBinding
 import com.adrc95.unsplashsample.ui.common.extension.loadUrl
 import com.adrc95.unsplashsample.ui.common.extension.setVisible
 import com.google.android.material.snackbar.Snackbar
-import dagger.android.support.DaggerAppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-class DetailActivity : DaggerAppCompatActivity(), DetailPresenter.View {
+@AndroidEntryPoint
+class DetailActivity : AppCompatActivity(), DetailPresenter.View {
 
     companion object {
         const val PHOTO = "DetailActivity:photoId"

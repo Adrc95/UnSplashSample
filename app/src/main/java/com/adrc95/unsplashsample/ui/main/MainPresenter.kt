@@ -10,7 +10,7 @@ import com.adrc95.unsplashsample.ui.common.view.BaseView
 import com.adrc95.usecase.GetPhotos
 import com.adrc95.usecase.Invoker
 
-class MainPresenter(private val navigator: Navigator, private val invoker: Invoker,
+class MainPresenter (private val navigator: Navigator, private val invoker: Invoker,
                     private val getPhotos: GetPhotos) : BasePresenter<MainPresenter.View>() {
 
     override fun initialize(extras: Bundle?) {

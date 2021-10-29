@@ -1,18 +1,19 @@
 package com.adrc95.unsplashsample.ui.main
 
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
 import com.adrc95.unsplashsample.databinding.ActivityMainBinding
+import com.adrc95.unsplashsample.ui.common.EndlessRecyclerOnScrollListener
 import com.adrc95.unsplashsample.ui.common.GridSpacingItemDecoration
 import com.adrc95.unsplashsample.ui.common.extension.setVisible
-import dagger.android.support.DaggerAppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import com.adrc95.unsplashsample.ui.common.EndlessRecyclerOnScrollListener
 
-
-class MainActivity : DaggerAppCompatActivity(), MainPresenter.View {
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity(), MainPresenter.View {
 
     private lateinit var binding : ActivityMainBinding
 

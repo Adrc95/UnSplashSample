@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'kotlinx-serialization'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -59,6 +60,10 @@ android {
         // Because of annotation-experimental
         disable("UnsafeExperimentalUsageError", "UnsafeExperimentalUsageWarning")
     }
+
+    kapt {
+        correctErrorTypes = true
+    }
 }
 
 dependencies {
@@ -74,11 +79,9 @@ dependencies {
     implementation  'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0'
     implementation 'io.arrow-kt:arrow-core:1.0.0'
-    implementation 'com.google.dagger:dagger-android:2.39.1'
-    implementation 'com.google.dagger:dagger-android-support:2.39.1'
+    implementation 'com.google.dagger:hilt-android:2.39.1'
+    kapt 'com.google.dagger:hilt-compiler:2.39.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-    kapt "com.google.dagger:dagger-compiler:2.39.1"
-    kapt "com.google.dagger:dagger-android-processor:2.39.1"
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     kapt 'com.github.bumptech.glide:compiler:4.12.0'
     testImplementation 'junit:junit:4.13.2'
