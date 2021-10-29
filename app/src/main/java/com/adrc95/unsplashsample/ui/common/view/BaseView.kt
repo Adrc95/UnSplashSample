@@ -1,3 +1,6 @@
 package com.adrc95.unsplashsample.ui.common.view
 
-interface BaseView
+interface BaseView {
+    fun showLoading()
+    fun hideLoading()
+}
