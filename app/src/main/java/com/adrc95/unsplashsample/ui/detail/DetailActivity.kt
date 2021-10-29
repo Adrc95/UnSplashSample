@@ -2,20 +2,20 @@ package com.adrc95.unsplashsample.ui.detail
 
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
 import com.adrc95.domain.model.Camera
 import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
 import com.adrc95.unsplashsample.databinding.ActivityDetailBinding
 import com.adrc95.unsplashsample.ui.common.extension.loadUrl
 import com.adrc95.unsplashsample.ui.common.extension.setVisible
+import com.adrc95.unsplashsample.ui.common.view.BaseActivity
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class DetailActivity : AppCompatActivity(), DetailPresenter.View {
+class DetailActivity : BaseActivity<ActivityDetailBinding, DetailPresenter.View, DetailPresenter>(), DetailPresenter.View {
 
     companion object {
         const val PHOTO = "DetailActivity:photoId"
@@ -27,37 +27,20 @@ class DetailActivity : AppCompatActivity(), DetailPresenter.View {
         }
     }
 
-    private lateinit var binding : ActivityDetailBinding
-
     @Inject
-    lateinit var presenter : DetailPresenter
+    override lateinit var presenter : DetailPresenter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initializeBinding()
-        initializePresenter()
+    override fun bindView(layoutInflater: LayoutInflater): ActivityDetailBinding =
+        ActivityDetailBinding.inflate(layoutInflater)
+
+    override fun onActivityCreated() {
         initializeHooks()
-    }
-
-    private fun initializeBinding() {
-        binding = ActivityDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-    }
-
-    private fun initializePresenter() {
-        presenter.attachView(this)
-        presenter.initialize(intent.extras)
     }
 
     private fun initializeHooks() = with(binding){
         ivBack.setOnClickListener {
             presenter.onBackClick()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.detachView()
     }
 
     override fun showCameraInfo(camera: Camera) {
@@ -82,8 +65,12 @@ class DetailActivity : AppCompatActivity(), DetailPresenter.View {
             .show()
     }
 
-    override fun showLoading(show: Boolean) = with(binding) {
-        loading.setVisible(show)
+    override fun showLoading() = with(binding) {
+        loading.setVisible(true)
+    }
+
+    override fun hideLoading() = with(binding) {
+        loading.setVisible(false)
     }
 
     override fun goBack() {

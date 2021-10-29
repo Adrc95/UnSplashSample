@@ -18,16 +18,16 @@ class MainPresenter (private val navigator: Navigator, private val invoker: Invo
     }
 
     private fun loadPhotos(page: Int = 1) {
-        getView()?.showLoading(true)
+        getView()?.showLoading()
         val params = GetPhotos.Params(page = page)
         invoker.execute(getPhotos, params, ::onPhotosArrived)
     }
 
     private fun onPhotosArrived(result: Either<ApiError, List<Photo>>) {
         result.fold(ifLeft = {
-            getView()?.showLoading(false)
+            getView()?.hideLoading()
         }, ifRight = {
-            getView()?.showLoading(false)
+            getView()?.hideLoading()
             getView()?.renderPhotos(it)
         })
     }
@@ -41,7 +41,6 @@ class MainPresenter (private val navigator: Navigator, private val invoker: Invo
     }
 
     interface View : BaseView {
-        fun showLoading(show : Boolean)
         fun renderPhotos(photos: List<Photo>)
     }
 }

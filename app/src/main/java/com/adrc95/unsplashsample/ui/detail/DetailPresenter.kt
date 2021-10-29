@@ -23,17 +23,17 @@ class DetailPresenter(
   }
 
   private fun loadPhoto() {
-    getView()?.showLoading(true)
+    getView()?.showLoading()
     val params = GetPhoto.Params(photoId)
     invoker.execute(getPhoto, params, ::onPhotoArrived)
   }
 
   private fun onPhotoArrived(result: Either<ApiError, Photo>) {
     result.fold(ifLeft = {
-      getView()?.showLoading(false)
+      getView()?.hideLoading()
       getView()?.displayLoadingPhotoError()
     }, ifRight = {
-      getView()?.showLoading(false)
+      getView()?.hideLoading()
       getView()?.renderPhoto(it)
     })
   }
@@ -52,7 +52,6 @@ class DetailPresenter(
     fun showCameraInfo(camera: Camera)
     fun renderPhoto(photo: Photo)
     fun displayLoadingPhotoError()
-    fun showLoading(show: Boolean)
     fun goBack();
   }
 }

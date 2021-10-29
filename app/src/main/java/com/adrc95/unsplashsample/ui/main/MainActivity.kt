@@ -1,7 +1,7 @@
 package com.adrc95.unsplashsample.ui.main
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
 import androidx.recyclerview.widget.GridLayoutManager
 import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
@@ -9,35 +9,26 @@ import com.adrc95.unsplashsample.databinding.ActivityMainBinding
 import com.adrc95.unsplashsample.ui.common.EndlessRecyclerOnScrollListener
 import com.adrc95.unsplashsample.ui.common.GridSpacingItemDecoration
 import com.adrc95.unsplashsample.ui.common.extension.setVisible
+import com.adrc95.unsplashsample.ui.common.view.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), MainPresenter.View {
+class MainActivity : BaseActivity<ActivityMainBinding, MainPresenter.View, MainPresenter>(), MainPresenter.View {
 
-    private lateinit var binding : ActivityMainBinding
-
-    private lateinit var adapter: PhotosAdapter
+    private val adapter: PhotosAdapter by lazy {
+        PhotosAdapter(presenter::onPhotoClicked)
+    }
 
     @Inject
-    lateinit var presenter : MainPresenter
+    override lateinit var presenter : MainPresenter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initializeBinding()
-        initializePresenter()
+    override fun bindView(layoutInflater: LayoutInflater): ActivityMainBinding =
+        ActivityMainBinding.inflate(layoutInflater)
+
+    override fun onActivityCreated() {
         initializeToolbar()
         initializeList()
-    }
-
-    private fun initializeBinding() {
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-    }
-
-    private fun initializePresenter() {
-        presenter.attachView(this)
-        presenter.initialize(intent.extras)
     }
 
     private fun initializeToolbar() {
@@ -48,7 +39,6 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     private fun initializeList() {
         val spacingInPixels = resources.getDimensionPixelSize(R.dimen.spacing_small)
         val layoutManager = GridLayoutManager(this, 2)
-        adapter = PhotosAdapter(presenter::onPhotoClicked)
         binding.rvPhotos.layoutManager = layoutManager
         binding.rvPhotos.addItemDecoration(GridSpacingItemDecoration(layoutManager.spanCount,
             spacingInPixels, true, 0))
@@ -61,13 +51,12 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
         })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.detachView()
+    override fun showLoading() = with(binding)  {
+        loading.setVisible(true)
     }
 
-    override fun showLoading(show: Boolean) = with(binding) {
-        loading.setVisible(show)
+    override fun hideLoading() = with(binding)  {
+        loading.setVisible(false)
     }
 
     override fun renderPhotos(photos: List<Photo>) {
