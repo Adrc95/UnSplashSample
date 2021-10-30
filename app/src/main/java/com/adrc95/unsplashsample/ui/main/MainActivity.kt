@@ -1,27 +1,30 @@
 package com.adrc95.unsplashsample.ui.main
 
-import android.os.Bundle
+import android.content.Intent
 import android.view.LayoutInflater
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
 import com.adrc95.unsplashsample.databinding.ActivityMainBinding
 import com.adrc95.unsplashsample.ui.common.EndlessRecyclerOnScrollListener
+import com.adrc95.unsplashsample.ui.common.EventObserver
 import com.adrc95.unsplashsample.ui.common.GridSpacingItemDecoration
 import com.adrc95.unsplashsample.ui.common.extension.setVisible
 import com.adrc95.unsplashsample.ui.common.view.BaseActivity
+import com.adrc95.unsplashsample.ui.detail.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity<ActivityMainBinding, MainPresenter.View, MainPresenter>(), MainPresenter.View {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     private val adapter: PhotosAdapter by lazy {
-        PhotosAdapter(presenter::onPhotoClicked)
+        PhotosAdapter(viewModel::onPhotoClicked)
     }
 
-    @Inject
-    override lateinit var presenter : MainPresenter
+    private val viewModel: MainViewModel by viewModels()
 
     override fun bindView(layoutInflater: LayoutInflater): ActivityMainBinding =
         ActivityMainBinding.inflate(layoutInflater)
@@ -29,6 +32,15 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainPresenter.View, MainP
     override fun onActivityCreated() {
         initializeToolbar()
         initializeList()
+        initializeNavigation()
+    }
+
+    override fun initFlows() {
+        launch {
+            viewModel.state.collect {
+                manageState(it)
+            }
+        }
     }
 
     private fun initializeToolbar() {
@@ -46,20 +58,47 @@ class MainActivity : BaseActivity<ActivityMainBinding, MainPresenter.View, MainP
         binding.rvPhotos.adapter = adapter
         binding.rvPhotos.addOnScrollListener(object : EndlessRecyclerOnScrollListener(layoutManager) {
             override fun onLoadMore(page: Int) {
-                presenter.onLoadMore(page)
+                viewModel.onLoadMore(page)
             }
         })
     }
 
-    override fun showLoading() = with(binding)  {
+    private fun initializeNavigation() {
+        viewModel.navigateToPhotoDetail.observe(this, EventObserver { photo ->
+            val intent = DetailActivity.getIntent(this, photo.id)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+        })
+    }
+
+    private fun manageState(state: MainViewState) {
+
+        if (state is MainViewState.Loading) {
+            showLoading()
+        }
+        else {
+            hideLoading()
+        }
+
+        when (state) {
+            is MainViewState.ShowPhotos -> {
+                renderPhotos(state.photos)
+            }
+            is MainViewState.LoadPhotos -> {
+                viewModel.onLoadPhotos()
+            }
+        }
+    }
+
+    private fun showLoading() = with(binding)  {
         loading.setVisible(true)
     }
 
-    override fun hideLoading() = with(binding)  {
+    private fun hideLoading() = with(binding)  {
         loading.setVisible(false)
     }
 
-    override fun renderPhotos(photos: List<Photo>) {
+    private fun renderPhotos(photos: List<Photo>) {
         adapter.photos = adapter.photos + photos
     }
 
