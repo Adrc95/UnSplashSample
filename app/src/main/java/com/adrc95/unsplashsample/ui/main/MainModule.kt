@@ -13,11 +13,11 @@ import dagger.hilt.android.components.ActivityComponent
 @InstallIn(ActivityComponent::class)
 class MainModule {
 
-    @Provides
+    /*@Provides
     fun provideMainPresenter(navigator: Navigator, invoker: Invoker, getPhotos: GetPhotos): MainPresenter
-            = MainPresenter(navigator, invoker, getPhotos)
+            = MainPresenter(navigator, invoker, getPhotos)*/
 
-    @Provides
+    /*@Provides
     fun provideGetPhotosUseCase(photosRepository: PhotosRepository): GetPhotos
-            = GetPhotos(photosRepository)
+            = GetPhotos(photosRepository)*/
 }

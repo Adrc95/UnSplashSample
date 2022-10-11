@@ -9,8 +9,9 @@ import com.adrc95.unsplashsample.ui.common.presenter.BasePresenter
 import com.adrc95.unsplashsample.ui.common.view.BaseView
 import com.adrc95.usecase.GetPhotos
 import com.adrc95.usecase.Invoker
+import javax.inject.Inject
 
-class MainPresenter (private val navigator: Navigator, private val invoker: Invoker,
+class MainPresenter @Inject constructor (private val navigator: Navigator, private val invoker: Invoker,
                     private val getPhotos: GetPhotos) : BasePresenter<MainPresenter.View>() {
 
     override fun initialize(extras: Bundle?) {

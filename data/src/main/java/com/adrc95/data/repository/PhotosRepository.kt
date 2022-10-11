@@ -4,8 +4,10 @@ import arrow.core.Either
 import com.adrc95.data.source.PhotosNetworkDataSource
 import com.adrc95.domain.model.Photo
 import com.adrc95.domain.exception.ApiError
+import javax.inject.Inject
 
-class PhotosRepository(private val networkDataSource: PhotosNetworkDataSource) {
+class PhotosRepository @Inject constructor(
+  private val networkDataSource: PhotosNetworkDataSource) {
 
   suspend fun getPhotos(page: Int): Either<ApiError, List<Photo>> = networkDataSource.getPhotos(page)
 
