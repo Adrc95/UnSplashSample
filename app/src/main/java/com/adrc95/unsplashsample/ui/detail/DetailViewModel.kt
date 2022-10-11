@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.adrc95.unsplashsample.di.IO
+import com.adrc95.unsplashsample.ui.navigation.NavArg
 import com.adrc95.usecase.GetPhoto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,9 +23,7 @@ class DetailViewModel @Inject constructor(
   private val _state = MutableStateFlow(DetailViewState())
   val state: StateFlow<DetailViewState> = _state.asStateFlow()
 
-  private val photoId: String by lazy {
-    savedStateHandle.get<String>(DetailActivity.PHOTO) ?: ""
-  }
+  private val photoId = savedStateHandle.get<String>(NavArg.PhotoID.key) ?: ""
 
   init {
     loadPhoto()

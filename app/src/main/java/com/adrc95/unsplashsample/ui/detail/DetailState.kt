@@ -23,8 +23,8 @@ class DetailState(
 
     fun onCameraTextClick(camera: Camera?) {
         camera?.let {
-            val dialog = CameraInfoDialog(it)
-            dialog.show(supportFragmentManager, activity.getString(R.string.camera_info_dialog))
+            //val dialog = CameraInfoDialog(it)
+            //dialog.show(supportFragmentManager, activity.getString(R.string.camera_info_dialog))
         }
     }
 
