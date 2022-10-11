@@ -9,6 +9,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -19,13 +21,12 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class NetworkModule {
+object NetworkModule {
 
+    @ApiUrl
     @Provides
-    @Named("unsplash")
-    fun providesEndpoint(): String {
-        return "https://api.unsplash.com"
-    }
+    @Singleton
+    fun providesEndpoint(): String = "https://api.unsplash.com"
 
     @Provides
     @Singleton
@@ -41,9 +42,9 @@ class NetworkModule {
     @Singleton
     fun providesHeaderInterceptor (): HeadersInterceptor = HeadersInterceptor()
 
+    @Factory
     @ExperimentalSerializationApi
     @Provides
-    @Named("json_factory")
     fun provideJsonFactory(): Converter.Factory {
         val contentType = "application/json".toMediaType()
         return Json {
@@ -55,10 +56,10 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideUnsplashApiService(
-        @Named("unsplash") endpoint: String,
+        @ApiUrl endpoint: String,
         headerInterceptor: HeadersInterceptor,
         httpLoggingInterceptor: HttpLoggingInterceptor,
-        @Named("json_factory") jsonFactory : Converter.Factory,
+        @Factory jsonFactory : Converter.Factory,
     ): APIService<UnsplashApiService> {
         return APIService(
             UnsplashApiService::class.java,
@@ -67,5 +68,9 @@ class NetworkModule {
             arrayOf(headerInterceptor, httpLoggingInterceptor)
         )
     }
+
+    @IO
+    @Provides
+    fun providesMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
 
 }
