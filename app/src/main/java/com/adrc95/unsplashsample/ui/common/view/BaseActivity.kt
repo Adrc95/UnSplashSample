@@ -4,18 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlin.coroutines.CoroutineContext
 
-abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), CoroutineScope {
-
-    private lateinit var job: Job
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
+abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity() {
 
     protected val binding : VBinding by lazy { bindView(layoutInflater) }
 
@@ -29,18 +19,5 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), Corou
     }
 
     open fun onActivityCreated() {}
-
-    open fun initFlows() {}
-
-    override fun onStart() {
-        super.onStart()
-        job = SupervisorJob()
-        initFlows()
-    }
-
-    override fun onStop() {
-        job.cancel()
-        super.onStop()
-    }
 
 }

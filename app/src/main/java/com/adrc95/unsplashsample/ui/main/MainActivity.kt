@@ -1,6 +1,5 @@
 package com.adrc95.unsplashsample.ui.main
 
-import android.content.Intent
 import android.view.LayoutInflater
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -8,20 +7,19 @@ import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
 import com.adrc95.unsplashsample.databinding.ActivityMainBinding
 import com.adrc95.unsplashsample.ui.common.EndlessRecyclerOnScrollListener
-import com.adrc95.unsplashsample.ui.common.EventObserver
 import com.adrc95.unsplashsample.ui.common.GridSpacingItemDecoration
+import com.adrc95.unsplashsample.ui.common.extension.launchAndCollect
 import com.adrc95.unsplashsample.ui.common.extension.setVisible
 import com.adrc95.unsplashsample.ui.common.view.BaseActivity
-import com.adrc95.unsplashsample.ui.detail.DetailActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
+    private lateinit var mainState: MainState
+
     private val adapter: PhotosAdapter by lazy {
-        PhotosAdapter(viewModel::onPhotoClicked)
+        PhotosAdapter(mainState::onPhotoClicked)
     }
 
     private val viewModel: MainViewModel by viewModels()
@@ -30,17 +28,21 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         ActivityMainBinding.inflate(layoutInflater)
 
     override fun onActivityCreated() {
+        initializeMainState()
         initializeToolbar()
         initializeList()
-        initializeNavigation()
+        initFlows()
     }
 
-    override fun initFlows() {
-        launch {
-            viewModel.state.collect {
-                manageState(it)
-            }
+    private fun initFlows() {
+        launchAndCollect(viewModel.state) {
+            showLoading(it.loading)
+            renderPhotos(it.photos)
         }
+    }
+
+    private fun initializeMainState() {
+        mainState = buildMainState()
     }
 
     private fun initializeToolbar() {
@@ -63,39 +65,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         })
     }
 
-    private fun initializeNavigation() {
-        viewModel.navigateToPhotoDetail.observe(this, EventObserver { photo ->
-            val intent = DetailActivity.getIntent(this, photo.id)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-        })
-    }
-
-    private fun manageState(state: MainViewState) {
-
-        if (state is MainViewState.Loading) {
-            showLoading()
-        }
-        else {
-            hideLoading()
-        }
-
-        when (state) {
-            is MainViewState.ShowPhotos -> {
-                renderPhotos(state.photos)
-            }
-            is MainViewState.LoadPhotos -> {
-                viewModel.onLoadPhotos()
-            }
-        }
-    }
-
-    private fun showLoading() = with(binding)  {
-        loading.setVisible(true)
-    }
-
-    private fun hideLoading() = with(binding)  {
-        loading.setVisible(false)
+    private fun showLoading(visible: Boolean) = with(binding)  {
+        loading.setVisible(visible)
     }
 
     private fun renderPhotos(photos: List<Photo>) {

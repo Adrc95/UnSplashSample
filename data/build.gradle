@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation project(":domain")
     implementation 'io.arrow-kt:arrow-core:1.1.3'
+    implementation 'javax.inject:javax.inject:1'
 }
 
 java {
