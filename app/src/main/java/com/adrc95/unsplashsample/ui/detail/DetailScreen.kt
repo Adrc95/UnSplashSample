@@ -1,6 +1,5 @@
 package com.adrc95.unsplashsample.ui.detail
 
-import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,11 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +31,6 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,12 +41,13 @@ import com.adrc95.domain.model.Author
 import com.adrc95.domain.model.Camera
 import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
+import com.adrc95.unsplashsample.ui.common.component.CameraDetailDialog
 import com.adrc95.unsplashsample.ui.common.component.ImageUrl
 
 @Composable
 fun DetailScreen(viewModel: DetailViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
-    DetailScreenView(state)
+    DetailScreenView(state = state)
 }
 
 @Preview(name = "Light", showBackground = true)
@@ -75,9 +76,10 @@ fun DetailScreenPreview() {
     )
 }
 
-
 @Composable
 fun DetailScreenView(state: DetailViewState) {
+    var showDialog by remember { mutableStateOf(false) }
+    var camera : Camera? by remember { mutableStateOf(null) }
     Box {
         ImageUrl(
             url = state.photo?.url, modifier = Modifier
@@ -94,7 +96,6 @@ fun DetailScreenView(state: DetailViewState) {
                     }
                 }
         )
-
         if (state.loading) {
             CircularProgressIndicator(modifier = Modifier.align(alignment = Alignment.Center))
         }
@@ -102,15 +103,23 @@ fun DetailScreenView(state: DetailViewState) {
             BottomPhotoInfo(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = if(isSystemInDarkTheme()) Color.Black else Color.White)
+                    .background(color = if (isSystemInDarkTheme()) Color.Black else Color.White)
                     .align(alignment = Alignment.BottomEnd),
                 photo = it,
                 onCameraTextClicked = {
-
+                    showDialog = true
+                    camera = it
                 }
             )
         }
+    }
 
+    if (showDialog) {
+        camera?.let {
+            CameraDetailDialog(camera = it) {
+                showDialog = false
+            }
+        }
     }
 }
 
