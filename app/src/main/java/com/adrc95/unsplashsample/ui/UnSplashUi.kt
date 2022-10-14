@@ -4,9 +4,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -22,7 +27,25 @@ fun App(
     Screen {
         Scaffold(
             scaffoldState = appState.scaffoldState,
-            topBar = { Toolbar(text =  stringResource(id = R.string.app_name))}
+            topBar = {
+                Toolbar(
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.app_name)
+                        )
+                    },
+                    navigationIcon = {
+                        if (appState.showUpNavigation) {
+                            IconButton(onClick = { appState.onUpClick() }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = "Back"
+                                )
+                            }
+                        }
+                    }
+                )
+            }
         ) { padding ->
             Box(
                 modifier = Modifier
