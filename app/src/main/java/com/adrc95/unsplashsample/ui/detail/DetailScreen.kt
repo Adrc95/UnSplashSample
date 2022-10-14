@@ -4,7 +4,6 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -103,7 +103,7 @@ fun DetailScreenView(state: DetailViewState) {
             BottomPhotoInfo(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = if (isSystemInDarkTheme()) Color.Black else Color.White)
+                    .background(MaterialTheme.colors.background)
                     .align(alignment = Alignment.BottomEnd),
                 photo = it,
                 onCameraTextClicked = {
@@ -153,13 +153,13 @@ fun BottomPhotoInfo(
             ) {
                 Text(
                     text = "${photo.author.firstName} ${photo.author.lasName}",
-                    color = if(isSystemInDarkTheme()) Color.White else Color.Black,
+                    color = MaterialTheme.colors.onBackground,
                     fontSize = dimensionResource(id = R.dimen.subtitle).value.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
                     text = photo.author.username,
-                    color = if(isSystemInDarkTheme()) Color.White else Color.Black,
+                    color = MaterialTheme.colors.onBackground,
                     fontSize = dimensionResource(id = R.dimen.caption).value.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -171,7 +171,7 @@ fun BottomPhotoInfo(
             )
             Text(
                 text = photo.camera?.model ?: "",
-                color = if(isSystemInDarkTheme()) Color.White else Color.Black,
+                color = MaterialTheme.colors.onBackground,
                 fontSize = dimensionResource(id = R.dimen.caption).value.sp,
                 modifier = Modifier
                     .clickable(
