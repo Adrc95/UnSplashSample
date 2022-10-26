@@ -14,24 +14,38 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.adrc95.domain.exception.ApiError
 import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
 import com.adrc95.unsplashsample.ui.common.component.ImageUrl
+import com.adrc95.unsplashsample.ui.common.extension.message
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
-fun MainScreen(onPhotoClicked: (Photo) -> Unit, viewModel: MainViewModel = hiltViewModel()) {
+fun MainScreen(
+    onPhotoClicked: (Photo) -> Unit,
+    viewModel: MainViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState
+) {
     val state by viewModel.state.collectAsState()
     UnSplashItemsList(
+        snackbarHostState = snackbarHostState,
         loading = state.loading,
         photos = state.photos,
+        error = state.error,
         onPhotoClick = onPhotoClicked,
         modifier = Modifier.fillMaxSize()
     )
@@ -53,11 +67,15 @@ fun MainScreen(onPhotoClicked: (Photo) -> Unit, viewModel: MainViewModel = hiltV
 
 @Composable
 fun UnSplashItemsList(
-    modifier : Modifier = Modifier,
+    modifier: Modifier = Modifier,
     photos: List<Photo> = arrayListOf(),
+    error: ApiError?,
     loading: Boolean,
+    snackbarHostState: SnackbarHostState,
     onPhotoClick: (Photo) -> Unit,
 ) {
+    val context = LocalContext.current
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -83,6 +101,14 @@ fun UnSplashItemsList(
                     )
                 }
             }
+        }
+    }
+    error?.let {
+        coroutineScope.launch {
+            snackbarHostState.showSnackbar(
+                message = it.message(context),
+                duration = SnackbarDuration.Short
+            )
         }
     }
 }

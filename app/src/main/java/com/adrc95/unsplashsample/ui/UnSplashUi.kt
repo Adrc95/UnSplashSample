@@ -52,7 +52,7 @@ fun App(
                     .fillMaxHeight()
                     .padding(padding)
             ) {
-                AppNavigation(appState.navController)
+                AppNavigation(appState.navController, appState.scaffoldState.snackbarHostState)
             }
         }
     }

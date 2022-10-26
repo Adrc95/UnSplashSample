@@ -1,5 +1,6 @@
 package com.adrc95.unsplashsample.ui.navigation
 
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -12,16 +13,19 @@ import com.adrc95.unsplashsample.ui.detail.DetailScreen
 import com.adrc95.unsplashsample.ui.main.MainScreen
 
 @Composable
-fun AppNavigation(navController: NavHostController) {
+fun AppNavigation(navController: NavHostController, snackbarHostState: SnackbarHostState) {
     NavHost(
         navController = navController,
         startDestination = Feature.MAIN.route
     ) {
-        mainNav(navController)
+        mainNav(navController, snackbarHostState)
     }
 }
 
-private fun NavGraphBuilder.mainNav(navController: NavController) {
+private fun NavGraphBuilder.mainNav(
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
+) {
     navigation(
         startDestination = NavCommand.ContentType(Feature.MAIN).route,
         route = Feature.MAIN.route
@@ -30,7 +34,8 @@ private fun NavGraphBuilder.mainNav(navController: NavController) {
             MainScreen(
                 onPhotoClicked = { photo ->
                     navController.navigateToDetailFromMain(photo.id)
-                }
+                },
+                snackbarHostState = snackbarHostState
             )
         }
 
