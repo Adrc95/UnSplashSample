@@ -30,6 +30,7 @@ import com.adrc95.domain.exception.ApiError
 import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
 import com.adrc95.unsplashsample.ui.common.component.ImageUrl
+import com.adrc95.unsplashsample.ui.common.component.InfiniteListHandler
 import com.adrc95.unsplashsample.ui.common.extension.message
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -41,80 +42,56 @@ fun MainScreen(
     snackbarHostState: SnackbarHostState
 ) {
     val state by viewModel.state.collectAsState()
-    UnSplashItemsList(
+    UnSplashContent(
         snackbarHostState = snackbarHostState,
         loading = state.loading,
         photos = state.photos,
         error = state.error,
         onPhotoClick = onPhotoClicked,
+        onLoadMore = {
+            if (!state.loading) {
+                viewModel.onLoadMore()
+            }
+        },
         modifier = Modifier.fillMaxSize()
     )
 
 }
 
-/*
- private fun initializeList() {
-        binding.rvPhotos.addOnScrollListener(object : EndlessRecyclerOnScrollListener(layoutManager) {
-            override fun onLoadMore(page: Int) {
-                viewModel.onLoadMore(page)
-            }
-        })
-    }
- */
-//    private fun renderPhotos(photos: List<Photo>) {
-//        adapter.photos = adapter.photos + photos
-//    }
-
 @Composable
 fun UnSplashItemsList(
     modifier: Modifier = Modifier,
-    photos: List<Photo> = arrayListOf(),
-    error: ApiError?,
-    loading: Boolean,
-    snackbarHostState: SnackbarHostState,
+    photos: List<Photo>,
     onPhotoClick: (Photo) -> Unit,
+    onLoadMore: () -> Unit
 ) {
-    val context = LocalContext.current
-    val coroutineScope: CoroutineScope = rememberCoroutineScope()
-    Box(
+    val state = rememberLazyGridState()
+    LazyVerticalGrid(
         modifier = modifier,
-        contentAlignment = Alignment.Center
+        state = state,
+        contentPadding = PaddingValues(dimensionResource(id = R.dimen.spacing_small)),
+        verticalArrangement =
+        Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_small)),
+        horizontalArrangement =
+        Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_small)),
+        columns = GridCells.Fixed(2)
     ) {
-        val state = rememberLazyGridState()
-        if (loading) {
-            CircularProgressIndicator()
-        }
-        if (photos.isNotEmpty()) {
-            LazyVerticalGrid(
-                state = state,
-                contentPadding = PaddingValues(dimensionResource(id = R.dimen.spacing_small)),
-                verticalArrangement =
-                Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_small)),
-                horizontalArrangement =
-                Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_small)),
-                columns = GridCells.Fixed(2)
-            ) {
-                items(photos) {
-                    UnSplashListItem(
-                        photo = it,
-                        modifier = Modifier.clickable { onPhotoClick(it) }
-                    )
-                }
-            }
-        }
-    }
-    error?.let {
-        coroutineScope.launch {
-            snackbarHostState.showSnackbar(
-                message = it.message(context),
-                duration = SnackbarDuration.Short
+        items(photos) {
+            UnSplashListItem(
+                photo = it,
+                modifier = Modifier.clickable { onPhotoClick(it) }
             )
         }
     }
+    InfiniteListHandler(
+        listState = state,
+        buffer = 4,
+        onLoadMore = onLoadMore
+    )
 }
 
 @Composable
-fun UnSplashListItem(photo: Photo, modifier: Modifier = Modifier) {
+fun UnSplashListItem(modifier: Modifier = Modifier, photo: Photo) {
     Card(
         modifier = modifier
     ) {
@@ -127,6 +104,43 @@ fun UnSplashListItem(photo: Photo, modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .aspectRatio(1 / 1.5f)
             )
+        }
+    }
+}
+
+@Composable
+fun UnSplashContent(
+    modifier: Modifier = Modifier,
+    photos: List<Photo> = arrayListOf(),
+    error: ApiError?,
+    loading: Boolean,
+    snackbarHostState: SnackbarHostState,
+    onPhotoClick: (Photo) -> Unit,
+    onLoadMore: () -> Unit
+) {
+    val context = LocalContext.current
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        if (photos.isNotEmpty()) {
+            UnSplashItemsList(
+                photos = photos,
+                onPhotoClick = onPhotoClick,
+                onLoadMore = onLoadMore
+            )
+        }
+        if (loading) {
+            CircularProgressIndicator()
+        }
+        error?.let {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    message = it.message(context),
+                    duration = SnackbarDuration.Short
+                )
+            }
         }
     }
 }

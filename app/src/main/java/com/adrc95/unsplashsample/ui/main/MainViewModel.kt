@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,23 +21,40 @@ class MainViewModel @Inject constructor(
     private val _state = MutableStateFlow(MainViewState())
     val state: StateFlow<MainViewState> = _state.asStateFlow()
 
+    private var page: Int = 1
+
     init {
         loadPhotos()
     }
 
-    private fun loadPhotos(page: Int = 1) {
-        _state.value = MainViewState(loading = true)
+    private fun loadPhotos() {
+        _state.update { state ->
+            state.copy(
+                loading = true
+            )
+        }
         val params = GetPhotos.Params(page = page)
         viewModelScope.launch(dispatcher) {
             getPhotos.run(params).fold(ifLeft = {
-                _state.value = MainViewState(error = it)
+                _state.update { state ->
+                    state.copy(
+                        loading = false,
+                        error = it
+                    )
+                }
             }, ifRight = {
-                _state.value = MainViewState(photos = it)
+                _state.update { state ->
+                    state.copy(
+                        loading = false,
+                        photos = state.photos + it
+                    )
+                }
+                ++page
             })
         }
     }
 
-    fun onLoadMore(page: Int) {
-        loadPhotos(page)
+    fun onLoadMore() {
+        loadPhotos()
     }
 }
