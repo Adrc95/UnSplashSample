@@ -40,7 +40,7 @@ private fun NavGraphBuilder.mainNav(
         }
 
         composable(navCommand = NavCommand.ContentDetail(Feature.MAIN, listOf(NavArg.PhotoID))) {
-            DetailScreen()
+            DetailScreen(snackbarHostState = snackbarHostState)
         }
     }
 }

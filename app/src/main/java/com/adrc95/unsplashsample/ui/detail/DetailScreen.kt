@@ -15,12 +15,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +34,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,11 +47,18 @@ import com.adrc95.domain.model.Photo
 import com.adrc95.unsplashsample.R
 import com.adrc95.unsplashsample.ui.common.component.CameraDetailDialog
 import com.adrc95.unsplashsample.ui.common.component.ImageUrl
+import com.adrc95.unsplashsample.ui.common.extension.message
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
-fun DetailScreen(viewModel: DetailViewModel = hiltViewModel()) {
+fun DetailScreen(viewModel: DetailViewModel = hiltViewModel(),
+                 snackbarHostState: SnackbarHostState) {
     val state by viewModel.state.collectAsState()
-    DetailScreenView(state = state)
+    DetailScreenView(
+        state = state,
+        snackbarHostState = snackbarHostState
+    )
 }
 
 @Preview(name = "Light", showBackground = true)
@@ -72,12 +83,15 @@ fun DetailScreenPreview() {
                 description = "description",
                 createdAt = ""
             )
-        )
+        ),
+        snackbarHostState = null
     )
 }
 
 @Composable
-fun DetailScreenView(state: DetailViewState) {
+fun DetailScreenView(state: DetailViewState, snackbarHostState: SnackbarHostState?) {
+    val context = LocalContext.current
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
     var showDialog by remember { mutableStateOf(false) }
     var camera : Camera? by remember { mutableStateOf(null) }
     Box {
@@ -111,6 +125,16 @@ fun DetailScreenView(state: DetailViewState) {
                     camera = it
                 }
             )
+        }
+        state.error?.let {
+            snackbarHostState?.let {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = state.error.message(context),
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
         }
     }
 
