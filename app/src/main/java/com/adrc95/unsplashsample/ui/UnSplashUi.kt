@@ -34,8 +34,10 @@ fun App(
                             text = stringResource(id = R.string.app_name)
                         )
                     },
-                    navigationIcon = {
-                        if (appState.showUpNavigation) {
+                    navigationIcon = if (!appState.showUpNavigation) {
+                        null
+                    } else {
+                        {
                             IconButton(onClick = { appState.onUpClick() }) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowBack,
