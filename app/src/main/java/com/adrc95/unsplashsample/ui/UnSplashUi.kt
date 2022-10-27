@@ -3,6 +3,7 @@ package com.adrc95.unsplashsample.ui
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.adrc95.unsplashsample.R
 import com.adrc95.unsplashsample.ui.common.component.Toolbar
 import com.adrc95.unsplashsample.ui.navigation.AppNavigation
@@ -31,7 +33,12 @@ fun App(
                 Toolbar(
                     title = {
                         Text(
-                            text = stringResource(id = R.string.app_name)
+                            text = stringResource(id = R.string.app_name),
+                            modifier = if (appState.showUpNavigation) {
+                                Modifier.offset(x = (-16).dp)
+                            } else {
+                                Modifier
+                            }
                         )
                     },
                     navigationIcon = if (!appState.showUpNavigation) {
